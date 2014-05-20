@@ -124,6 +124,15 @@ IRQ_STACK_START_IN:
  */
 
 reset:
+	// 设置GPJ2CON的bit[0:15]，配置GPJ2_0/1/2/3引脚为输出功能
+	ldr r1, =0xE0200280 					
+	ldr r0, =0x00001111
+	str r0, [r1]
+
+	//4只led闪烁1次
+	ldr	r0, =0x1
+	bl	blink
+
 	bl	save_boot_params
 	/*
 	 * set the cpu to SVC32 mode

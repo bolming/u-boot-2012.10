@@ -1,0 +1,2 @@
+#!/bin/sh
+sudo dd iflag=dsync oflag=dsync if=./smdkv210-spl.bin of=/dev/sdc seek=1

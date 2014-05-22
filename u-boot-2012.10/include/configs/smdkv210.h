@@ -1,10 +1,8 @@
 /*
- * (C) Copyright 2009 Samsung Electronics
- * Minkyu Kang <mk7.kang@samsung.com>
- * HeungJun Kim <riverful.kim@samsung.com>
- * Inki Dae <inki.dae@samsung.com>
+ * (C) Copyright 2013  Wang Baoming Individual
+ * Wang Baoming <dollgo@126.com>
  *
- * Configuation settings for the SAMSUNG SMDKC100 board.
+ * Configuation settings for the SAMSUNG SMDKV210 board.
  *
  * See file CREDITS for list of people who contributed to this
  * project.
@@ -41,17 +39,17 @@
 
 #define CONFIG_ARCH_CPU_INIT
 
-#define CONFIG_DISPLAY_CPUINFO
-#define CONFIG_DISPLAY_BOARDINFO
+#define CONFIG_DISPLAY_CPUINFO		1
+#define CONFIG_DISPLAY_BOARDINFO	1
 
-/* input clock of PLL: SMDKC100 has 12MHz input clock */
-#define CONFIG_SYS_CLK_FREQ		12000000
+/* input clock of PLL: SMDKV210 has 24MHz input clock */
+#define CONFIG_SYS_CLK_FREQ		24000000
 
 /* DRAM Base */
-#define CONFIG_SYS_SDRAM_BASE		0x30000000
+#define CONFIG_SYS_SDRAM_BASE		0x20000000
 
-#define CONFIG_SETUP_MEMORY_TAGS
-#define CONFIG_CMDLINE_TAG
+#define CONFIG_SETUP_MEMORY_TAGS	1
+#define CONFIG_CMDLINE_TAG		1
 #define CONFIG_INITRD_TAG
 #define CONFIG_CMDLINE_EDITING
 
@@ -63,11 +61,31 @@
 /*
  * select serial console configuration
  */
-#define CONFIG_SERIAL0			1	/* use SERIAL 0 on SMDKC100 */
+#define CONFIG_SERIAL0			1	/* use SERIAL 0 on SMDKV210 */
 #define CONFIG_SERIAL_MULTI		1
 
 /* PWM */
 #define CONFIG_PWM			1
+
+/* lowlevel spl */
+/*#define	CONFIG_SKIP_LOWLEVEL_INIT	1*/
+#define	DEBUG				1
+#define	CONFIG_SPL			1
+/*#define	CONFIG_SPL_FRAMEWORK		1*/
+#define	CONFIG_SPL_STACK		(0xD0037D80)
+
+#define	COPY_BL2_FNPTR_ADDR		(0xD0037F98)
+#define	BL2_START_OFFSET		(49)
+#define	BL2_SIZE_BLOC_COUNT		(512)
+
+/* net configureation */
+#define CONFIG_CMD_PING			1
+
+#define CONFIG_NETMASK      	255.255.255.0  
+#define CONFIG_IPADDR       	192.168.1.4 
+#define CONFIG_SERVERIP     	192.168.1.2 
+#define CONFIG_ETHADDR          0d:0e:0d:0e:0d:0e  
+#define CONFIG_GATEWAYIP        192.168.1.1  
 
 /* allow to overwrite serial and ethaddr */
 #define CONFIG_ENV_OVERWRITE
@@ -80,14 +98,37 @@
 
 #undef CONFIG_CMD_FLASH
 #undef CONFIG_CMD_IMLS
-#undef CONFIG_CMD_NAND
+/*#undef CONFIG_CMD_NAND*/
+
+/* xxx cmd */
+#define	CONFIG_CMD_XXX
+
+/* nand flash*/
+#define CONFIG_CMD_NAND
+#define CONFIG_SYS_MAX_NAND_DEVICE 	1
+#define CONFIG_SYS_NAND_BASE 		0xB0E00000
+#define CONFIG_NAND_S5PV210
+
+/* flash debug */
+#define	CONFIG_MTD_DEBUG
+#define	CONFIG_MTD_DEBUG_VERBOSE	3
+#define	CONFIG_CMD_NANDCHECK
+
+#undef CONFIG_USE_NAND_BOARD_INIT
 
 #define CONFIG_CMD_CACHE
 #define CONFIG_CMD_REGINFO
-#define CONFIG_CMD_ONENAND
+/*#define CONFIG_CMD_ONENAND	*/
 #define CONFIG_CMD_ELF
 #define CONFIG_CMD_FAT
 #define CONFIG_CMD_MTDPARTS
+#define	CONFIG_CMD_MMC
+
+/* SD/MMC configuration */
+#define CONFIG_GENERIC_MMC
+#define CONFIG_MMC
+#define CONFIG_SDHCI
+#define CONFIG_S5P_SDHCI
 
 #define CONFIG_BOOTDELAY	3
 
@@ -105,18 +146,24 @@
 
 #define NORMAL_MTDPARTS_DEFAULT MTDPARTS_DEFAULT
 
-#define CONFIG_BOOTCOMMAND	"run ubifsboot"
+/*#define CONFIG_BOOTCOMMAND	"run ubifsboot"*/
+#define CONFIG_BOOTCOMMAND	"tftp 0x2a001000 uImage;bootm 0x2a001000"
 
 #define CONFIG_RAMDISK_BOOT	"root=/dev/ram0 rw rootfstype=ext2" \
 				" console=ttySAC0,115200n8" \
-				" mem=128M"
+				" mem=512M"
 
 #define CONFIG_COMMON_BOOT	"console=ttySAC0,115200n8" \
-				" mem=128M " \
+				" mem=512M " \
 				" " MTDPARTS_DEFAULT
 
-#define CONFIG_BOOTARGS	"root=/dev/mtdblock5 ubi.mtd=4" \
-			" rootfstype=cramfs " CONFIG_COMMON_BOOT
+/*#define CONFIG_BOOTARGS	"root=/dev/mtdblock5 ubi.mtd=4" \
+			" rootfstype=cramfs " CONFIG_COMMON_BOOT*/
+#define CONFIG_BOOTARGS		"root=/dev/nfs rw nfsroot=192.168.1.2:/srv/nfs/rootfs0 " \
+				"console=ttySAC0,115200 " \
+				"init=/linuxrc " \
+				"androidboot.console=s3c2410_serial0 skipcali=yes ctp=2 " \
+				"ip=192.168.1.4:192.168.1.2:192.168.1.1:255.255.255.0:Tiny210V2:eth0:off"
 
 #define CONFIG_UPDATEB	"updateb=onenand erase 0x0 0x40000;" \
 			" onenand write 0x32008000 0x0 0x40000\0"
@@ -158,8 +205,8 @@
 		" initrd=0x33000000,8M ramdisk=8192\0" \
 	"rootfstype=cramfs\0" \
 	"mtdparts=" MTDPARTS_DEFAULT "\0" \
-	"meminfo=mem=128M\0" \
-	"nfsroot=/nfsroot/arm\0" \
+	"meminfo=mem=512M\0" \
+	"nfsroot=/srv/nfs/rootfs0\0" \
 	"bootblock=5\0" \
 	"ubiblock=4\0" \
 	"ubi=enabled"
@@ -169,7 +216,7 @@
  */
 #define CONFIG_SYS_LONGHELP		/* undef to save memory */
 #define CONFIG_SYS_HUSH_PARSER		/* use "hush" command parser	*/
-#define CONFIG_SYS_PROMPT		"SMDKC100 # "
+#define CONFIG_SYS_PROMPT		"SMDKV210 # "
 #define CONFIG_SYS_CBSIZE	256	/* Console I/O Buffer Size */
 #define CONFIG_SYS_PBSIZE	384	/* Print Buffer Size */
 #define CONFIG_SYS_MAXARGS	16	/* max number of command args */
@@ -182,10 +229,11 @@
 
 #define CONFIG_SYS_HZ			1000
 
-/* SMDKC100 has 1 banks of DRAM, we use only one in U-Boot */
+/* SMDKV210 has 2 banks of DRAM, we use only one in U-Boot */
 #define CONFIG_NR_DRAM_BANKS	1
 #define PHYS_SDRAM_1		CONFIG_SYS_SDRAM_BASE	/* SDRAM Bank #1 */
-#define PHYS_SDRAM_1_SIZE	(128 << 20)	/* 0x8000000, 128 MB Bank #1 */
+/*#define PHYS_SDRAM_1_SIZE	(512 << 20)*/	/* 0x20000000, 512 MB Bank #1 */
+#define PHYS_SDRAM_1_SIZE	(0x20000000)
 
 #define CONFIG_SYS_MONITOR_BASE	0x00000000
 
@@ -195,7 +243,7 @@
 #define CONFIG_SYS_NO_FLASH		1
 
 #define CONFIG_SYS_MONITOR_LEN		(256 << 10)	/* 256 KiB */
-#define CONFIG_IDENT_STRING		" for SMDKC100"
+#define CONFIG_IDENT_STRING		" for SMDKV210"
 
 #if !defined(CONFIG_NAND_SPL) && (CONFIG_SYS_TEXT_BASE >= 0xc0000000)
 #define CONFIG_ENABLE_MMU
@@ -210,27 +258,28 @@
 /*-----------------------------------------------------------------------
  * Boot configuration
  */
-#define CONFIG_ENV_IS_IN_ONENAND	1
+/*#define CONFIG_ENV_IS_IN_ONENAND	1*/
+#define CONFIG_ENV_IS_NOWHERE		1
 #define CONFIG_ENV_SIZE			(128 << 10)	/* 128KiB, 0x20000 */
 #define CONFIG_ENV_ADDR			(256 << 10)	/* 256KiB, 0x40000 */
 #define CONFIG_ENV_OFFSET		(256 << 10)	/* 256KiB, 0x40000 */
 
-#define CONFIG_USE_ONENAND_BOARD_INIT
-#define CONFIG_SAMSUNG_ONENAND		1
-#define CONFIG_SYS_ONENAND_BASE		0xE7100000
-
 #define CONFIG_DOS_PARTITION		1
 
-#define CONFIG_SYS_INIT_SP_ADDR	(CONFIG_SYS_LOAD_ADDR - 0x1000000)
+#define CONFIG_SYS_INIT_SP_ADDR		(0xD0037D80)
 
 /*
  * Ethernet Contoller driver
  */
 #ifdef CONFIG_CMD_NET
-#define CONFIG_SMC911X         1       /* we have a SMC9115 on-board   */
-#define CONFIG_SMC911X_16_BIT  1       /* SMC911X_16_BIT Mode          */
-#define CONFIG_SMC911X_BASE    0x98800300      /* SMC911X Drive Base   */
-#define CONFIG_ENV_SROM_BANK   3       /* Select SROM Bank-3 for Ethernet*/
+
+#define CONFIG_DRIVER_DM9000		1       /* we have a DM9000 on-board   */
+#define CONFIG_ENV_SROM_BANK		1       /* Select SROM Bank-1 for Ethernet*/
+
+#define CONFIG_DM9000_BASE		0x88000000 /* DM9000 Drive Base   */
+#define DM9000_IO			CONFIG_DM9000_BASE
+#define DM9000_DATA			(CONFIG_DM9000_BASE + 0x4)
+
 #endif /* CONFIG_CMD_NET */
 
 #endif	/* __CONFIG_H */

@@ -28,17 +28,43 @@ include $(TOPDIR)/config.mk
 
 LIB	= $(obj)lib$(BOARD).o
 
-COBJS-y	:= smdkc100.o
-COBJS-$(CONFIG_SAMSUNG_ONENAND)	+= onenand.o
-SOBJS	:= lowlevel_init.o
+ifndef CONFIG_SPL_BUILD
+COBJS-y	:= smdkv210.o
+COBJS-$(CONFIG_NAND_S5PV210)	+= s5pv210_nand.o 
+endif
+
+ifdef CONFIG_SPL_BUILD
+COBJS-y	+= mmc_boot.o init_mem.o
+endif
+
+ifndef	CONFIG_SKIP_LOWLEVEL_INIT
+SOBJS	:= lowlevel_init.o mem_setup.o init_clock.o
+ifdef CONFIG_USE_NAND_BOARD_INIT
+SOBJS	+= nand.o
+endif
+endif
 
 SRCS    := $(SOBJS:.o=.S) $(COBJS-y:.o=.c)
 OBJS	:= $(addprefix $(obj),$(COBJS-y))
 SOBJS	:= $(addprefix $(obj),$(SOBJS))
 
+ALL	:=	 $(LIB)
+
+ifdef CONFIG_SPL_BUILD
+ALL	+= $(OBJTREE)/tools/mk$(BOARD)spl
+endif
+
+all:	$(ALL)
+
 $(LIB):	$(obj).depend $(SOBJS) $(OBJS)
 	$(call cmd_link_o_target, $(SOBJS) $(OBJS))
 
+#
+ifdef CONFIG_SPL_BUILD
+$(OBJTREE)/tools/mk$(BOARD)spl:	tools/mkv210_image.c
+	$(HOSTCC) tools/mkv210_image.c -o $(OBJTREE)/tools/mk$(BOARD)spl
+endif
+#
 #########################################################################
 
 # defines $(obj).depend target

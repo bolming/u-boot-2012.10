@@ -1,0 +1,5 @@
+#!/bin/sh
+cd ./spl/
+sudo ./write2sd
+cd ../
+sudo dd iflag=dsync oflag=dsync if=./u-boot.bin of=/dev/sdc seek=49

@@ -209,6 +209,8 @@ COBJS-y += dlmalloc.o
 COBJS-y += image.o
 COBJS-y += memsize.o
 COBJS-y += stdio.o
+# xxx cmd
+COBJS-$(CONFIG_CMD_XXX) += cmd_xxx.o
 
 
 COBJS	:= $(sort $(COBJS-y))

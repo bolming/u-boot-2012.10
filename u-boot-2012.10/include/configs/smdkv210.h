@@ -69,7 +69,7 @@
 
 /* lowlevel spl */
 /*#define	CONFIG_SKIP_LOWLEVEL_INIT	1*/
-#define	DEBUG				1
+#undef	DEBUG				1
 #define	CONFIG_SPL			1
 /*#define	CONFIG_SPL_FRAMEWORK		1*/
 #define	CONFIG_SPL_STACK		(0xD0037D80)
@@ -108,6 +108,8 @@
 #define CONFIG_SYS_MAX_NAND_DEVICE 	1
 #define CONFIG_SYS_NAND_BASE 		0xB0E00000
 #define CONFIG_NAND_S5PV210
+
+/*#define	CONFIG_NAND_SPL
 
 /* flash debug */
 #define	CONFIG_MTD_DEBUG

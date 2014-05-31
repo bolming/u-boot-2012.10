@@ -38,6 +38,8 @@
 #define	SP5V210_NFCONF_PAGE_SIZE(x)    ((x)<<2)
 #define	SP5V210_NFCONF_ADDR_CYCLE(x)    ((x)<<1)
 
+#define	CONFIG_NAND_SPL
+
 #ifdef CONFIG_NAND_SPL
 
 /* in the early stage of NAND flash booting, printf() is not available */
@@ -50,6 +52,25 @@ static void s5pv210_nand_read_buf(struct mtd_info *mtd, u_char *buf, int len)
 
 	for (i = 0; i < len; i++)
 		buf[i] = readb(this->IO_ADDR_R);
+}
+
+/**
+ * s5pv210_nand_write_buf - [Intern] write buffer to chip
+ * @mtd:	MTD device structure
+ * @buf:	data buffer
+ * @len:	number of bytes to write
+ *
+ * write function for 8bit buswith
+ */
+static void s5pv210_nand_write_buf(struct mtd_info *mtd, const uint8_t *buf, int len)
+{
+	int i;
+	struct nand_chip *chip = mtd->priv;
+	struct s5pv210_nand *nand = s5pv210_get_base_nand();
+	chip->IO_ADDR_W = &nand->nfdata;
+
+	for (i = 0; i < len; i++)
+		writeb(buf[i], chip->IO_ADDR_W);
 }
 #endif
 
@@ -190,6 +211,7 @@ int board_nand_init(struct nand_chip *nand)
 	/* read_byte and write_byte are default */
 #ifdef CONFIG_NAND_SPL
 	nand->read_buf = s5pv210_nand_read_buf;
+	nand->write_buf = s5pv210_nand_write_buf;
 #endif
 
 	/* hwcontrol always must be implemented */
